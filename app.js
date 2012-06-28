@@ -5,11 +5,14 @@
 
 var express = require('express')
   , routes = require('./routes')
+  , mongoose = require('mongoose')
   , async = require('async')
   , url = require('url')
   , RedisStore = require('connect-redis')(express);
   
-// redis session
+var app = module.exports = express.createServer();
+
+// Redis Session
 var rtg, redis;
 if(process.env.REDISTOGO_URL) {
   rtg = url.parse(process.env.REDISTOGO_URL);
@@ -19,35 +22,40 @@ if(process.env.REDISTOGO_URL) {
   redis = require('redis').createClient();
 }
 
-var app = module.exports = express.createServer();
-
 // Configuration
 
 app.configure(function(){
   app.use(stylus.middleware({ src: __dirname+'/public' }));
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
-  
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'your secret here' }));
+  app.use(express.session({
+    store: new RedisStore({client:redis}),
+    secret: process.env.CLIENT_SECRET || 'incipian'
+  }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  mongoose.connect('mongodb://localhost/entasso');
 });
 
 app.configure('production', function(){
   app.use(express.errorHandler());
+  mongoose.connect(process.env.MONGOHQ_URL);
 });
 
 // Routes
 
 app.get('/', routes.index);
 
-app.listen(3000, function(){
+// Listener
+
+var port = process.env.PORT || 3000;
+app.listen(port, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
