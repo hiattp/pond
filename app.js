@@ -7,6 +7,7 @@ var express = require('express')
   , routes = require('./routes')
   , mongoose = require('mongoose')
   , async = require('async')
+	, stylus = require('stylus')
   , url = require('url')
   , RedisStore = require('connect-redis')(express);
   
