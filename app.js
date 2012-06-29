@@ -9,6 +9,7 @@ var express = require('express')
   , async = require('async')
 	, stylus = require('stylus')
   , url = require('url')
+  , faceplate = require('faceplate')
   , RedisStore = require('connect-redis')(express);
   
 var app = module.exports = express.createServer();
@@ -35,6 +36,11 @@ app.configure(function(){
   app.use(express.session({
     store: new RedisStore({client:redis}),
     secret: process.env.CLIENT_SECRET || 'incipian'
+  }));
+  app.use(faceplate.middleware({
+    app_id: process.env.FACEBOOK_APP_ID,
+    secret: process.env.FACEBOOK_SECRET,
+    scope:  'email'
   }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
