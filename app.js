@@ -77,7 +77,8 @@ app.dynamicHelpers({
   url: function(req,res){
     return function(path){
       var host = req.headers['host'];
-      var scheme = req.headers['x-forwarded-proto'] || 'https';
+      // var scheme = req.headers['x-forwarded-proto'] || 'https';
+      var scheme = 'https';
       return scheme + "://" + host + path;
     }
   },
