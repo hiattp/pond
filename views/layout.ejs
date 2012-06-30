@@ -8,8 +8,8 @@
     
     <meta property="og:title" content="Pond: Eat your friends!" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="<%= url() %>" />
-    <meta property="og:image" content="<%= url('/logo.png') %>" />
+    <meta property="og:url" content="<%= url('') %>" />
+    <meta property="og:image" content="<%= url('/images/logo.png') %>" />
     <meta property="og:site_name" content="<%= app.name %>" />
     <meta property="og:description" content="My first app" />
     <meta property="fb:app_id" content="<%= appID %>" />
@@ -18,10 +18,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/javascripts/main.js"></script>
     
-    <script>
-    var socketURL = "<%= url() %>";
-    </script>
     
+    <script>
+    var socketURL = "<%= url('') %>";
+    </script>
   </head>
   <body>
     <%- body %>
