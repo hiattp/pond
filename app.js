@@ -4,13 +4,22 @@
  */
 
 var express = require('express')
+  , fs = require('fs')
   , mongoose = require('mongoose')
   , async = require('async')
 	, stylus = require('stylus')
+	, faceplate = require('faceplate')
   , url = require('url')
   , RedisStore = require('connect-redis')(express);
-  
-var app = module.exports = express.createServer();
+
+if(process.env.ENVIRONMENT == 'development'){
+  var app = module.exports = express.createServer({
+    key: fs.readFileSync('./ssl/pond.key'),
+    cert: fs.readFileSync('./ssl/pond.crt')
+  });
+} else {
+  var app = module.exports = express.createServer();
+}
 var io = require('socket.io').listen(app);
 
 // Redis Session
@@ -36,7 +45,7 @@ app.configure(function(){
     store: new RedisStore({client:redis}),
     secret: process.env.CLIENT_SECRET || 'incipian'
   }));
-  app.use(require('faceplate').middleware({
+  app.use(faceplate.middleware({
     app_id: process.env.FACEBOOK_APP_ID,
     secret: process.env.FACEBOOK_SECRET,
     scope:  'email'
@@ -61,7 +70,7 @@ app.dynamicHelpers({
   url: function(req,res){
     return function(path){
       var host = req.headers['host'];
-      var scheme = req.headers['x-forwarded-proto'] || 'http';
+      var scheme = req.headers['x-forwarded-proto'] || 'https';
       return scheme + "://" + host + path;
     }
   },

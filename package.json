@@ -10,7 +10,7 @@
     , "stylus": ">= 0.0.1"
     , "redis": ">= 0.0.1"
     , "connect-redis": ">= 0.0.1"
-    , "faceplate": "git://github.com/hiattp/faceplate.git#master"
+    , "faceplate": ">= 0.0.1"
     , "socket.io": ">= 0.0.1"
   }
   , "engines": {
