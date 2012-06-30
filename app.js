@@ -1,7 +1,4 @@
-
-/**
- * Module dependencies.
- */
+// Module Dependencies
 
 var express = require('express')
   , fs = require('fs')
@@ -12,6 +9,8 @@ var express = require('express')
   , url = require('url')
   , RedisStore = require('connect-redis')(express);
 
+// Create Server
+
 if(process.env.ENVIRONMENT == 'development'){
   var app = module.exports = express.createServer({
     key: fs.readFileSync('./ssl/pond.key'),
@@ -20,9 +19,17 @@ if(process.env.ENVIRONMENT == 'development'){
 } else {
   var app = module.exports = express.createServer();
 }
+
+// Socket.IO Server Object
+
 var io = require('socket.io').listen(app);
+io.configure(function () { 
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
 
 // Redis Session
+
 var rtg, redis;
 if(process.env.REDISTOGO_URL) {
   rtg = url.parse(process.env.REDISTOGO_URL);
@@ -32,7 +39,7 @@ if(process.env.REDISTOGO_URL) {
   redis = require('redis').createClient();
 }
 
-// Configuration
+// Server Configuration
 
 app.configure(function(){
   app.use(stylus.middleware({ src: __dirname+'/public' }));
