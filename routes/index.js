@@ -13,11 +13,4 @@ module.exports = function(app){
     });
   });
   
-  app.post('/', function(req,res){
-    req.facebook.plate.parse_signed_request(req.body.signed_request, function(result){
-      console.dir(result);
-      res.redirect('/');
-    });
-  });
-  
 }
