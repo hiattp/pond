@@ -4,7 +4,6 @@
  */
 
 var express = require('express')
-  , routes = require('./routes')
   , mongoose = require('mongoose')
   , async = require('async')
 	, stylus = require('stylus')
@@ -13,6 +12,7 @@ var express = require('express')
   , RedisStore = require('connect-redis')(express);
   
 var app = module.exports = express.createServer();
+var io = require('socket.io').listen(app);
 
 // Redis Session
 var rtg, redis;
@@ -56,9 +56,37 @@ app.configure('production', function(){
   mongoose.connect(process.env.MONGOHQ_URL);
 });
 
-// Routes
+// Helpers
 
-app.get('/', routes.index);
+app.dynamicHelpers({
+  host: function(req,res){
+    return req.headers['host'];
+  },
+  scheme: function(req,res){
+    req.headers['x-forwarded-proto'] || 'http'
+  },
+  url: function(req,res){
+    return function(path){
+      return app.dynamicViewHelpers.scheme(req, res) + app.dynamicViewHelpers.url_no_scheme(path);
+    }
+  },
+  url_no_scheme: function(req,res){
+    return function(path) {
+      return '://' + app.dynamicViewHelpers.host(req, res) + path;
+    }
+  }
+  appID: function(req,res){
+    return process.env.FACEBOOK_APP_ID;
+  }
+});
+
+// Connect Router(s)
+
+require('./routes')(app);
+
+// Connect Socket.IO Handler(s)
+
+require('./sockets')(io);
 
 // Listener
 

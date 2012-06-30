@@ -3,6 +3,14 @@
  * GET home page.
  */
 
-exports.index = function(req, res){
-  res.render('index', { title: 'Express' })
-};
+module.exports = function(app){
+  
+  app.get('/', function(req,res){
+    req.facebook.me(function(user){
+      res.render('index', {
+        user: user
+      });
+    });
+  });
+  
+}

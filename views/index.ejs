@@ -1,2 +1,6 @@
-<h1><%= title %></h1>
-<p>Welcome to <%= title %></p>
+<h1>Welcome to Pond</h1>
+<p>Connected Users: <span id="connected-users"></span></p>
+<h2>User Information:</h2>
+<% if(user) { %>
+<p><%= user %></p>
+<% } %>
