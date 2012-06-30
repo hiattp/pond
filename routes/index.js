@@ -14,7 +14,7 @@ module.exports = function(app){
   });
   
   app.post('/', function(req,res){
-    res.facebook.plate.parse_signed_request(req.body.signed_request, function(result){
+    req.facebook.plate.parse_signed_request(req.body.signed_request, function(result){
       console.dir(result);
       res.redirect('/');
     });
