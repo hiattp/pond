@@ -1,0 +1,10 @@
+<script>
+
+var authRedirect = "<%= authURLBase %>";
+authRedirect += "?" + "<%= clientID %>";
+authRedirect += "&" + "<%= redirectURL %>";
+authRedirect += "&" + "<%= scope %>";
+
+window.top.location = authRedirect;
+
+</script>

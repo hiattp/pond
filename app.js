@@ -11,7 +11,7 @@ var express = require('express')
 
 // Create Server
 
-if(process.env.ENVIRONMENT == 'development'){
+if(process.env.NODE_ENV == 'development'){
   var app = module.exports = express.createServer({
     key: fs.readFileSync('./ssl/pond.key'),
     cert: fs.readFileSync('./ssl/pond.crt')
@@ -23,7 +23,7 @@ if(process.env.ENVIRONMENT == 'development'){
 // Socket.IO Server Object
 
 var io = require('socket.io').listen(app);
-io.configure(function () { 
+io.configure(function () {
   io.set("transports", ["xhr-polling"]); 
   io.set("polling duration", 10); 
 });
@@ -45,6 +45,7 @@ app.configure(function(){
   app.use(stylus.middleware({ src: __dirname+'/public' }));
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
+  app.set('namespace', process.env.FACEBOOK_NAMESPACE);
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());

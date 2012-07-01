@@ -10,6 +10,7 @@ module.exports = function(io){
     
     socket.on("disconnect", function(){
       numConnections--;
+      io.sockets.emit("connections update", {total:numConnections});
     });
     
   });
