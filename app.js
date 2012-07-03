@@ -25,7 +25,7 @@ if(process.env.NODE_ENV == 'development'){
 var io = require('socket.io').listen(app);
 io.configure(function () {
   io.set("transports", ["xhr-polling"]); 
-  io.set("polling duration", 10); 
+  io.set("polling duration", 10);
 });
 
 // Redis Session
@@ -64,7 +64,7 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-  mongoose.connect('mongodb://localhost/entasso');
+  mongoose.connect('mongodb://localhost/pond');
 });
 
 app.configure('production', function(){
