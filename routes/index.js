@@ -1,9 +1,16 @@
+var mongoose = require('mongoose')
+  , User = mongoose.model('User');
+
 module.exports = function(app){
-  
-  app.get('/', function(req,res){
-    req.facebook.me(function(user){
-      res.render('index', {
-        user: user
+
+  app.get('/', function(req,res,next){
+    req.facebook.me(function(err,u){
+      if(err) next(err);
+      User.findOrCreateUser(u,function(err,user){
+        if(err) next(err);
+        res.render('index', {
+          user: user
+        });
       });
     });
   });

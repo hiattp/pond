@@ -3,6 +3,7 @@
 var express = require('express')
   , fs = require('fs')
   , mongoose = require('mongoose')
+  , User = require('./models/user')
   , async = require('async')
 	, stylus = require('stylus')
 	, faceplate = require('faceplate')
