@@ -4,13 +4,10 @@ var mongoose = require('mongoose')
 module.exports = function(app){
 
   app.get('/', function(req,res,next){
-    req.facebook.me(function(err,u){
+    User.findOrCreateUser(req.facebook, function(err,user){
       if(err) next(err);
-      User.findOrCreateUser(u,function(err,user){
-        if(err) next(err);
-        res.render('index', {
-          user: user
-        });
+      res.render('index',{
+        user : user
       });
     });
   });
