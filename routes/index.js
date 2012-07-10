@@ -7,7 +7,7 @@ module.exports = function(app){
     User.findOrCreateUser(req.facebook, function(err,user){
       if(err) next(err);
       res.render('index',{
-        user : user
+        userId : user._id
       });
     });
   });
