@@ -8,6 +8,10 @@ $(document).ready(function(){
       socket.emit('user checkin', {userId : userId});
     });
   }
+  
+  socket.on('checkin successful', function(data){
+    console.log(data);
+  });
 
   socket.on("connections update", function(data){
     $("#connected-users").text(data.total);

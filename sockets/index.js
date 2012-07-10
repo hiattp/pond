@@ -8,12 +8,16 @@ module.exports = function(io){
   
   io.sockets.on('connection', function(socket){
     numConnections++;
-
-    console.dir(socket);
-    
     socket.on('user checkin', function(data){
-      console.log("new checkin with data:");
-      console.dir(data);
+      User.findById(data.userId, function(err,user){
+        var newFish = {
+          socketId : socket.id,
+          fishDetails : user
+        };
+        GameMaster.addFish(newFish, function(){
+          socket.emit('checkin successful', GameMaster.allFish());
+        });
+      });
     });
     
     io.sockets.emit("connections update", {total:numConnections});

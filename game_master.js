@@ -7,6 +7,10 @@ var GameMaster = function(){
     fishList[newFish.socketId] = newFish.fishDetails;
     callback();
   };
+  
+  this.allFish = function allFish(){
+    return fishList;
+  }
 
   this.locationUpdate = function locationUpdate(){
     return locationArray;
