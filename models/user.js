@@ -18,6 +18,7 @@ var UserSchema = new Schema({
 });
 
 UserSchema.statics.findOrCreateUser = function findOrCreateUser(facebook, callback){
+  console.log(facebook);
   User.findOne({facebookId : facebook.signed_request.user_id}, function(err,doc){
     if(err) callback(err);
     else if(doc) callback(null,doc);

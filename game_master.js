@@ -8,12 +8,16 @@ var GameMaster = function(){
     callback();
   };
   
+  this.removeFish = function removeFish(socketId){
+    delete fishList[socketId];
+  };
+  
   this.allFish = function allFish(){
     return fishList;
   }
 
   this.locationUpdate = function locationUpdate(){
-    return locationArray;
+    return fishList;
   };
   
 };

@@ -2,9 +2,12 @@ var GameMaster = require('../game_master')
   , mongoose = require('mongoose')
   , User = mongoose.model('User');
 
-var numConnections = 0;
-
 module.exports = function(io){
+  
+  var numConnections = 0;
+  var gameActive = false;
+  var gameLoopInterval = 1000;
+  var gameLoopTimeout;
   
   io.sockets.on('connection', function(socket){
     numConnections++;
@@ -15,7 +18,10 @@ module.exports = function(io){
           fishDetails : user
         };
         GameMaster.addFish(newFish, function(){
-          socket.emit('checkin successful', GameMaster.allFish());
+          if(numConnections > 1){
+            gameActive = true;
+            gameLoop();
+          }
         });
       });
     });
@@ -24,9 +30,18 @@ module.exports = function(io){
     
     socket.on("disconnect", function(){
       numConnections--;
-      io.sockets.emit("connections update", {total:numConnections});
+      if(numConnections < 1){
+        clearTimeout(gameLoopTimeout);
+        gameActive = false;
+      }
+      GameMaster.removeFish(socket.id);
     });
     
   });
+  
+  var gameLoop = function gameLoop(){
+    io.sockets.emit("all objects", GameMaster.locationUpdate());
+    if(gameActive) gameLoopTimeout = setTimeout(gameLoop, gameLoopInterval);
+  }
   
 }
