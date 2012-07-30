@@ -1,25 +1,24 @@
 var fishList = {};
 var locationArray = [];
 
-var GameMaster = function(){
-  
-  this.addFish = function addFish(newFish,callback){
-    fishList[newFish.socketId] = newFish.fishDetails;
-    callback();
-  };
-  
-  this.removeFish = function removeFish(socketId){
-    delete fishList[socketId];
-  };
-  
-  this.allFish = function allFish(){
-    return fishList;
-  }
-
-  this.locationUpdate = function locationUpdate(){
-    return fishList;
-  };
-  
+var GameMaster = module.exports = function GameMaster(){
+  this.fishList = {};
+  this.locationArray = [];
 };
 
-module.exports = new GameMaster();
+GameMaster.prototype.addFish = function addFish(newFish,callback){
+  this.fishList[newFish.socketId] = newFish.fishDetails;
+  callback();
+};
+
+GameMaster.prototype.removeFish = function removeFish(socketId){
+  delete this.fishList[socketId];
+};
+
+GameMaster.prototype.allFish = function allFish(){
+  return this.fishList;
+}
+
+GameMaster.prototype.locationUpdate = function locationUpdate(){
+  return this.fishList;
+};

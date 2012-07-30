@@ -17,13 +17,15 @@
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/javascripts/main.js"></script>
-    
-    
     <script>
     var socketURL = "<%= url('') %>";
     </script>
+
   </head>
   <body>
-    <%- body %>
+    <div id="fb-root"></div>
+    <div id="allContent">
+      <%- body %>
+    </div>
   </body>
 </html>
