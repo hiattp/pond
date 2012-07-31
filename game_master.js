@@ -7,7 +7,13 @@ var GameMaster = module.exports = function GameMaster(){
 };
 
 GameMaster.prototype.addFish = function addFish(newFish,callback){
-  this.fishList[newFish.socketId] = newFish.fishDetails;
+  var fishDetails = {
+    name : newFish.name,
+    locX : 500,
+    locY : 300,
+    dir : 0
+  };
+  this.fishList[newFish.socketId] = fishDetails;
   callback();
 };
 

@@ -11,7 +11,7 @@ module.exports = function(io){
     , gameLoopTimeout;
   
   var gameLoop = function gameLoop(){
-    io.sockets.emit("all objects", gameMaster.locationUpdate());
+    io.sockets.emit('all objects', gameMaster.locationUpdate());
     console.dir(gameMaster.locationUpdate());
     if(gameActive) gameLoopTimeout = setTimeout(gameLoop, gameLoopInterval);
   }
@@ -22,7 +22,7 @@ module.exports = function(io){
       User.findById(data.userId, function(err,user){
         var newFish = {
           socketId : socket.id,
-          fishDetails : user
+          name : user.fullName
         };
         gameMaster.addFish(newFish, function(){
           if(numConnections > 0){
@@ -33,9 +33,17 @@ module.exports = function(io){
       });
     });
     
-    io.sockets.emit("connections update", {total:numConnections});
+    socket.on('pressed', function(data){
+      console.dir(data);
+    });
     
-    socket.on("disconnect", function(){
+    socket.on('released', function(data){
+      console.dir(data);
+    });
+    
+    io.sockets.emit('connections update', {total:numConnections});
+    
+    socket.on('disconnect', function(){
       numConnections--;
       if(numConnections < 1){
         clearTimeout(gameLoopTimeout);
