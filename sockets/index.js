@@ -33,12 +33,8 @@ module.exports = function(io){
       });
     });
     
-    socket.on('pressed', function(data){
-      console.dir(data);
-    });
-    
-    socket.on('released', function(data){
-      console.dir(data);
+    socket.on('register command', function(data){
+      gameMaster.registerCommand(socket.id,data);
     });
     
     io.sockets.emit('connections update', {total:numConnections});

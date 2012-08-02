@@ -48,7 +48,8 @@ $(document).keydown(function(event){
 	var key = event.which;
 	if((key == 37 || key == 38 || key == 39 || key == 40 || key == 32) && keysPressed.indexOf(key) < 0){
 		keysPressed.push(key);
-		sendInstruction(key,"pressed");
+    // 'p' stands for 'press'
+		sendInstruction(key,"p");
 	}
 });
 
@@ -57,24 +58,26 @@ $(document).keyup(function(event){
 	if(key == 37 || key == 38 || key == 39 || key == 40 || key == 32){
 		var indexOfKey = keysPressed.indexOf(key);
 		if(indexOfKey != -1) keysPressed.splice(indexOfKey,1);
-		sendInstruction(key,"released");
+		// 'r' stands for 'release'
+		sendInstruction(key,"r");
 	}
 });
 
+// don't allow opposite/contradictory key presses to send
 function sendInstruction(keynum,action){
   var timestamp = Date.now();
 	switch(keynum){
 		case 37:
-		  socket.emit(action, {dir : 'l', at : timestamp});
+		  socket.emit("register command", {dir : 'l', act : action, at : timestamp});
 			break;
 		case 38:
-		  socket.emit(action, {dir : 'u', at : timestamp});
+		  socket.emit("register command", {dir : 'u', act : action, at : timestamp});
 			break;
 		case 39:
-		  socket.emit(action, {dir : 'r', at : timestamp});
+		  socket.emit("register command", {dir : 'r', act : action, at : timestamp});
 			break;
 		case 40:
-		  socket.emit(action, {dir : 'd', at : timestamp});
+		  socket.emit("register command", {dir : 'd', act : action, at : timestamp});
 			break;
 		case 32:
       // spacebar
