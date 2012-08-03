@@ -45,25 +45,40 @@ $(document).ready(function(){
 });
 
 $(document).keydown(function(event){
-	var key = event.which;
-	if((key == 37 || key == 38 || key == 39 || key == 40 || key == 32) && keysPressed.indexOf(key) < 0){
-		keysPressed.push(key);
-    // 'p' stands for 'press'
+	var key = event.which
+	  , available = keysPressed.indexOf(key) < 0
+	  , contradicting = false;
+	switch(key){
+	  case 37:
+	    if(keysPressed.indexOf(39) >= 0) contradicting = true;
+	    break;
+	  case 39:
+	    if(keysPressed.indexOf(37) >= 0) contradicting = true;
+	    break;
+	  case 38:
+	    if(keysPressed.indexOf(40) >= 0) contradicting = true;
+	    break;
+	  case 40:
+	    if(keysPressed.indexOf(38) >= 0) contradicting = true;
+	    break;
+	}
+	if(available && !contradicting){
+	  keysPressed.push(key);
+    // 'p' means 'press'
 		sendInstruction(key,"p");
 	}
 });
 
 $(document).keyup(function(event){
 	var key = event.which;
-	if(key == 37 || key == 38 || key == 39 || key == 40 || key == 32){
+	if((key == 37 || key == 38 || key == 39 || key == 40) && keysPressed.indexOf(key) >= 0){
 		var indexOfKey = keysPressed.indexOf(key);
 		if(indexOfKey != -1) keysPressed.splice(indexOfKey,1);
-		// 'r' stands for 'release'
+		// 'r' means 'release'
 		sendInstruction(key,"r");
 	}
 });
 
-// don't allow opposite/contradictory key presses to send
 function sendInstruction(keynum,action){
   var timestamp = Date.now();
 	switch(keynum){
@@ -78,9 +93,6 @@ function sendInstruction(keynum,action){
 			break;
 		case 40:
 		  socket.emit("register command", {dir : 'd', act : action, at : timestamp});
-			break;
-		case 32:
-      // spacebar
 			break;
 	}
 }

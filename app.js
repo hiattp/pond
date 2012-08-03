@@ -23,7 +23,7 @@ if(process.env.NODE_ENV == 'development'){
 
 // Socket.IO Server Object
 
-var io = require('socket.io').listen(app);
+var io = require('socket.io').listen(app, {log : false});
 io.configure(function () {
   io.set("transports", ["xhr-polling"]); 
   io.set("polling duration", 10);
