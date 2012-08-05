@@ -158,7 +158,6 @@ function animate(){
 
 function drawAll(allFish) {
   allFish.forEach(function(fish){
-    console.log(fish.locX);
     drawFish(fish);
   });
 }

@@ -23,9 +23,9 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
     , proForce = axis == "x" ? self.aRight : self.aDown
     , antiForce = axis == "x" ? self.aLeft : self.aUp
     , currentVelocity = axis == "x" ? self.velX : self.velY
-    , universalKeypressAcceleration = 10.0
-    , universalFriction = 8.0
-    , universalMaxSpeed = 50.0
+    , universalKeypressAcceleration = 200.0
+    , universalFriction = 75.0
+    , universalMaxSpeed = 200.0
     , displacement = 0
     , startTime = self.lastUpdate
     , interCommandCorrectionPro = false

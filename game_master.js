@@ -18,6 +18,7 @@ GameMaster.prototype.allFish = function allFish(){
   return this.fishList;
 }
 
+// should queue up updates, not try to do them on send.
 GameMaster.prototype.locationUpdate = function locationUpdate(){
   var self = this
     , fishUpdate = {}
