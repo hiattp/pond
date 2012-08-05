@@ -3,7 +3,6 @@ var Fish = require('./fish')
 
 var GameMaster = module.exports = function GameMaster(){
   this.fishList = {};
-  this.locationArray = [];
 };
 
 GameMaster.prototype.addFish = function addFish(newFish,callback){
@@ -20,17 +19,25 @@ GameMaster.prototype.allFish = function allFish(){
 }
 
 GameMaster.prototype.locationUpdate = function locationUpdate(){
-  var fishUpdate = [];
-  for(fishId in this.fishList){
-    var fish = this.fishList[fishId]
-      , timeNow = Date.now();
+  var self = this
+    , fishUpdate = []
+    , timeNow = Date.now();
+  // is it possible to have commands issued after this stopTime?
+  for(fishId in self.fishList){
+    var fish = self.fishList[fishId];
     fish.updateLocationAndVelocity('x', timeNow).updateLocationAndVelocity('y', timeNow).setLastUpdate(timeNow);
+    fishUpdate.push({
+      name : fish.name,
+      locX : fish.locX,
+      locY : fish.locY
+    });
+    console.log(fish.locX);
   }
-  return this.fishList;
+  console.log("update physics runtime for "+ Object.keys(self.fishList).length +" fish: "+(Date.now() - timeNow)+" ms.");
+  return fishUpdate;
 };
 
 GameMaster.prototype.registerCommand = function registerCommand(socketId,c){
-  // NEED TO USE NEW FISH NOTATION HERE?
   var fish = this.fishList[socketId];
   switch(c.dir){
     case "l":

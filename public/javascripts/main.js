@@ -1,5 +1,5 @@
 var socket, canvas, context;
-var allFish = {}
+var allFish = []
   , keysPressed = [];
 
 $(document).ready(function(){
@@ -21,7 +21,7 @@ $(document).ready(function(){
     });
 
     socket.on("all objects", function(data){
-      allFish = data;
+      allFish = data.fishUpdate;
       drawAll();
     });
     
@@ -98,9 +98,9 @@ function sendInstruction(keynum,action){
 }
 
 function drawAll() {
-  for(fish in allFish){
-    drawFish(allFish[fish]);
-  }
+  allFish.forEach(function(fish){
+    drawFish(fish);
+  });
 }
 
 function drawFish(fish){

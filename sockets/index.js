@@ -11,7 +11,7 @@ module.exports = function(io){
     , gameLoopTimeout;
   
   var gameLoop = function gameLoop(){
-    io.sockets.emit('all objects', gameMaster.locationUpdate());
+    io.sockets.emit('all objects', {fishUpdate: gameMaster.locationUpdate()});
     if(gameActive) gameLoopTimeout = setTimeout(gameLoop, gameLoopInterval);
   }
   
