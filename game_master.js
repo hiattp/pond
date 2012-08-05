@@ -31,7 +31,6 @@ GameMaster.prototype.locationUpdate = function locationUpdate(){
       locX : fish.locX,
       locY : fish.locY
     });
-    console.log(fish.locX);
   }
   console.log("update physics runtime for "+ Object.keys(self.fishList).length +" fish: "+(Date.now() - timeNow)+" ms.");
   return fishUpdate;

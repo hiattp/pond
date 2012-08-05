@@ -20,12 +20,12 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
   // This function takes arrays of timestamps representing starts and stops 
   // of acceleration being applied to the fish to get the resulting distance traveled.
   var self = this
-    , proForce = axis == "x" ? self.aRight : self.aUp
-    , antiForce = axis == "x" ? self.aLeft : self.aDown
+    , proForce = axis == "x" ? self.aRight : self.aDown
+    , antiForce = axis == "x" ? self.aLeft : self.aUp
     , currentVelocity = axis == "x" ? self.velX : self.velY
     , universalKeypressAcceleration = 10.0
     , universalFriction = 8.0
-    , universalMaxSpeed = 10.0
+    , universalMaxSpeed = 50.0
     , displacement = 0
     , startTime = self.lastUpdate
     , interCommandCorrectionPro = false
@@ -66,12 +66,7 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
   while(proForceChunk.length > 0 || antiForceChunk.length > 0){
     if(proForceChunk.length > 0 && (antiForceChunk.length == 0 || proForceChunk[1] < antiForceChunk[1])){
       var duration = proForceChunk[0] - proForceChunk[1];
-      console.log("acc: " + universalKeypressAcceleration);
-      console.log("duration: " + duration);
-      console.log("curVel: " + currentVelocity);
-      console.log("cur dis: " + displacement);
       movementPhysics(duration, 'pro');
-      console.log("res dis: " + displacement);
       var chunkEnd = proForceChunk[0];
       proForceChunk = proForce.length > 0 ? proForce.splice(proForce.length-2,2) : [];
       if(proForceChunk.length > 0 || antiForceChunk.length > 0) interChunkDowntime(chunkEnd);
@@ -90,12 +85,12 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
     // if max speed exceeded, find displacement during acceleration then displacement at max for the rest
     if(Math.abs(resultingVel) > universalMaxSpeed) {
       var max = universalMaxSpeed * directionMultiplier;
-      var timeAccelerating = (max - currentVelocity) / (directionMultiplier * universalKeypressAcceleration);
-      displacement += (directionMultiplier*universalKeypressAcceleration)*(timeAccelerating*timeAccelerating / 1000000) / 2 + currentVelocity*timeAccelerating;
-      displacement += universalMaxSpeed * (moveDur - timeAccelerating) / 1000;
-      currentVelocity = universalMaxSpeed;
+      var timeAccelerating = (max - currentVelocity) / (directionMultiplier * universalKeypressAcceleration) * 1000;
+      displacement += (directionMultiplier*universalKeypressAcceleration)*(timeAccelerating*timeAccelerating / 1000000) / 2 + currentVelocity*timeAccelerating / 1000;
+      displacement += max * (moveDur - timeAccelerating) / 1000;
+      currentVelocity = directionMultiplier*universalMaxSpeed;
     } else {
-      displacement += (directionMultiplier*universalKeypressAcceleration)*(moveDur*moveDur / 1000000) / 2 + currentVelocity*moveDur;
+      displacement += (directionMultiplier*universalKeypressAcceleration)*(moveDur*moveDur / 1000000) / 2 + currentVelocity*moveDur / 1000;
       currentVelocity = resultingVel;
     }
   }
@@ -113,7 +108,7 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
     if(currentVelocity > 0){
       var resultingVel = (-1*universalFriction)*downtimeLength/1000 + currentVelocity;
       if(resultingVel < 0){
-        var downtimeMovementDuration = (-1 * currentVelocity) / (-1*universalFriction);
+        var downtimeMovementDuration = (-1 * currentVelocity) / (-1*universalFriction) * 1000;
         downtimeDisplacement(downtimeMovementDuration, 'anti');
         currentVelocity = 0;
       } else {
@@ -121,9 +116,9 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
         currentVelocity = resultingVel;
       }
     } else if(currentVelocity < 0){
-      var resultingVel = universalFriction*downtimeLength + currentVelocity;
+      var resultingVel = universalFriction*downtimeLength/1000 + currentVelocity;
       if(resultingVel > 0){
-        var downtimeMovementDuration = (-1 * currentVelocity) / universalFriction;
+        var downtimeMovementDuration = (-1 * currentVelocity) / universalFriction * 1000;
         downtimeDisplacement(downtimeMovementDuration, 'pro');
         currentVelocity = 0;
       } else {
@@ -135,16 +130,10 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
   
   function downtimeDisplacement(moveDur, accelerationDirection){
     var directionMultiplier = accelerationDirection == 'pro' ? 1 : -1;
-    console.log("in downtimeDisp and dis is: "+displacement);
-    displacement += (directionMultiplier*universalFriction)*(moveDur*moveDur / 1000000) / 2 + currentVelocity*moveDur;
-        console.log("in downtimeDisp and after dis is: "+displacement);
+    displacement += (directionMultiplier*universalFriction)*(moveDur*moveDur / 1000000) / 2 + currentVelocity*moveDur/1000;
   }
-  
   // calculate velocity after any chunk
-  console.log("disp before end dt: "+ displacement);
-  console.log("deadtime: "+ deadtimeAtEnd);
   if(currentVelocity != 0) downtimePhysics(deadtimeAtEnd);
-  console.log("disp after end dt: "+ displacement);
   // set final velocity and displacement
   if(axis == "x"){
     self.velX = currentVelocity;
@@ -156,7 +145,7 @@ Fish.prototype.updateLocationAndVelocity = function updateLocationAndVelocity(ax
   
   // add back continued keypress if segment was between keypress and keyup
   if(interCommandCorrectionPro) proForce.unshift(stopTime);
-  if(interCommandCorrectionAnti) antiForce.unshift(stopTime);
+   if(interCommandCorrectionAnti) antiForce.unshift(stopTime);
   
   return self;
 };
