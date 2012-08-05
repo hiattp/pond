@@ -1,6 +1,7 @@
 var socket, canvas, context;
 var keysPressed = []
-  , locationUpdates = [];
+  , locationUpdates = []
+  , animationOn = false;
 
 $(document).ready(function(){
   
@@ -12,15 +13,20 @@ $(document).ready(function(){
       socket.emit('user checkin', {userId : userId});
     });
     
-    socket.on("checkin successful", function(data){
-      animate();
-    });
+    // socket.on("checkin successful", function(data){
+    //   console.log("animate!");
+    //   animate();
+    // });
 
     socket.on("connections update", function(data){
       $("#connected-users").text(data.total);
     });
 
     socket.on("all objects", function(data){
+      if(!animationOn && locationUpdates.length == 2){
+        animationOn = true;
+        animate();
+      }
       if(locationUpdates.length > 2){
         locationUpdates.pop();
         locationUpdates.unshift(data);
@@ -39,7 +45,7 @@ $(document).ready(function(){
       function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        drawAll();
+        // drawAll(); NEED TO PUT THIS BACK IN?
       }
       resizeCanvas();
   })();
@@ -129,8 +135,8 @@ function animate(){
     var timeBetweenUpdates = locationUpdates[leadingIndex].timestamp - locationUpdates[laggingIndex].timestamp;
     var fractionBetween = (targetTime - locationUpdates[laggingIndex].timestamp) / timeBetweenUpdates;
     Object.keys(locationUpdates[leadingIndex].fishUpdate).forEach(function(fid){
-      var newFishData = locationUpdates.fishUpdate[fid];
-      var prevFishData = locationUpdates.fishUpdate[fid];
+      var newFishData = locationUpdates[leadingIndex].fishUpdate[fid];
+      var prevFishData = locationUpdates[laggingIndex].fishUpdate[fid];
       if(newFishData && prevFishData){
         fishToDraw.push({
           locX : (newFishData.locX - prevFishData.locX) * fractionBetween + prevFishData.locX,
@@ -152,6 +158,7 @@ function animate(){
 
 function drawAll(allFish) {
   allFish.forEach(function(fish){
+    console.log(fish.locX);
     drawFish(fish);
   });
 }
