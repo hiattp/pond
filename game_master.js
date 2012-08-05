@@ -20,17 +20,18 @@ GameMaster.prototype.allFish = function allFish(){
 
 GameMaster.prototype.locationUpdate = function locationUpdate(){
   var self = this
-    , fishUpdate = []
+    , fishUpdate = {}
     , timeNow = Date.now();
   // is it possible to have commands issued after this stopTime?
   for(fishId in self.fishList){
     var fish = self.fishList[fishId];
     fish.updateLocationAndVelocity('x', timeNow).updateLocationAndVelocity('y', timeNow).setLastUpdate(timeNow);
-    fishUpdate.push({
+    fishUpdate[fishId] = {
       name : fish.name,
       locX : fish.locX,
-      locY : fish.locY
-    });
+      locY : fish.locY,
+      dir : fish.dir
+    };
   }
   console.log("update physics runtime for "+ Object.keys(self.fishList).length +" fish: "+(Date.now() - timeNow)+" ms.");
   return fishUpdate;

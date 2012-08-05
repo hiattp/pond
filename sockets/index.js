@@ -7,11 +7,11 @@ module.exports = function(io){
   
   var numConnections = 0
     , gameActive = false
-    , gameLoopInterval = 1000
+    , gameLoopInterval = 100
     , gameLoopTimeout;
   
   var gameLoop = function gameLoop(){
-    io.sockets.emit('all objects', {fishUpdate: gameMaster.locationUpdate()});
+    io.sockets.emit('all objects', {timestamp : Date.now(), fishUpdate: gameMaster.locationUpdate()});
     if(gameActive) gameLoopTimeout = setTimeout(gameLoop, gameLoopInterval);
   }
   

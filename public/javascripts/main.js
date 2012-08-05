@@ -1,6 +1,6 @@
 var socket, canvas, context;
-var allFish = []
-  , keysPressed = [];
+var keysPressed = []
+  , locationUpdates = [];
 
 $(document).ready(function(){
   
@@ -13,7 +13,7 @@ $(document).ready(function(){
     });
     
     socket.on("checkin successful", function(data){
-      console.log(data);
+      animate();
     });
 
     socket.on("connections update", function(data){
@@ -21,8 +21,10 @@ $(document).ready(function(){
     });
 
     socket.on("all objects", function(data){
-      allFish = data.fishUpdate;
-      drawAll();
+      if(locationUpdates.length > 2){
+        locationUpdates.pop();
+        locationUpdates.unshift(data);
+      } else locationUpdates.unshift(data);
     });
     
   }
@@ -97,7 +99,58 @@ function sendInstruction(keynum,action){
 	}
 }
 
-function drawAll() {
+window.requestAnimFrame = (function(callback) {
+  return window.requestAnimationFrame || 
+  window.webkitRequestAnimationFrame || 
+  window.mozRequestAnimationFrame || 
+  window.oRequestAnimationFrame || 
+  window.msRequestAnimationFrame || 
+  function(callback) {
+    window.setTimeout(callback, 1000 / 60);
+  };
+})();
+
+// temporarily assume no potential for packet loss
+// locationUpdates = []
+function animate(){
+  var fishToDraw = [];
+  var interpolationBuffer = 100;
+  var targetTime = Date.now() - interpolationBuffer;
+  // update
+  var leadingIndex, laggingIndex;
+  if(locationUpdates.length >= 2){
+    for(i=1;i<locationUpdates.length;i++){
+      if(locationUpdates[i].timestamp <= targetTime){
+        leadingIndex = i-1;
+        laggingIndex = i;
+        break;
+      }
+    }
+    var timeBetweenUpdates = locationUpdates[leadingIndex].timestamp - locationUpdates[laggingIndex].timestamp;
+    var fractionBetween = (targetTime - locationUpdates[laggingIndex].timestamp) / timeBetweenUpdates;
+    Object.keys(locationUpdates[leadingIndex].fishUpdate).forEach(function(fid){
+      var newFishData = locationUpdates.fishUpdate[fid];
+      var prevFishData = locationUpdates.fishUpdate[fid];
+      if(newFishData && prevFishData){
+        fishToDraw.push({
+          locX : (newFishData.locX - prevFishData.locX) * fractionBetween + prevFishData.locX,
+          locY : (newFishData.locY - prevFishData.locY) * fractionBetween + prevFishData.locY,
+          dir : newFishData.dir
+        });
+      }
+    });
+    // clear
+    context.clearRect(0,0,canvas.width, canvas.height);
+    // draw
+    drawAll(fishToDraw);
+    // request new frame
+    requestAnimFrame(function(){
+      animate();
+    });
+  } else animate();
+};
+
+function drawAll(allFish) {
   allFish.forEach(function(fish){
     drawFish(fish);
   });
