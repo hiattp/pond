@@ -4,7 +4,7 @@ var keysPressed = []
   , animationOn = false;
 
 $(document).ready(function(){
-  
+  // loadSprites();
   if(userId){
     
     socket = io.connect(socketURL); // socketURL definition in layout.ejs
@@ -23,6 +23,7 @@ $(document).ready(function(){
     });
 
     socket.on("all objects", function(data){
+      console.log("RECEIVED LOCATION UPDATE");
       if(!animationOn && locationUpdates.length == 2){
         animationOn = true;
         animate();
@@ -31,6 +32,11 @@ $(document).ready(function(){
         locationUpdates.pop();
         locationUpdates.unshift(data);
       } else locationUpdates.unshift(data);
+      if(logsNum < 25){
+        console.log(locationUpdates.map(function(u){return u.number}));
+        if(locationUpdates.length >=2) console.log("time between: "+(locationUpdates[0].timestamp-locationUpdates[1].timestamp));
+        logsNum++;
+      }
     });
     
   }
@@ -118,9 +124,10 @@ window.requestAnimFrame = (function(callback) {
 
 // temporarily assume no potential for packet loss
 // locationUpdates = []
+var logsNum = 0
 function animate(){
   var fishToDraw = [];
-  var interpolationBuffer = 100;
+  var interpolationBuffer = 150;
   var targetTime = Date.now() - interpolationBuffer;
   // update
   var leadingIndex, laggingIndex;
@@ -134,6 +141,18 @@ function animate(){
     }
     var timeBetweenUpdates = locationUpdates[leadingIndex].timestamp - locationUpdates[laggingIndex].timestamp;
     var fractionBetween = (targetTime - locationUpdates[laggingIndex].timestamp) / timeBetweenUpdates;
+    // if(logsNum < 25){
+    //   console.log("lagging index: "+laggingIndex);
+    //   console.log("leading index: "+leadingIndex);
+    //   console.log("lag using: "+locationUpdates[laggingIndex].number);
+    //   console.log("lead using: "+locationUpdates[leadingIndex].number);
+    //   console.log("lag time: "+locationUpdates[laggingIndex].timestamp);
+    //   console.log("target time: "+targetTime);      
+    //   console.log("lead time: "+locationUpdates[leadingIndex].timestamp);      
+    //   console.log("fraction: "+fractionBetween);
+    //   // console.log(locationUpdates[laggingIndex].timestamp);
+    //   logsNum++;
+    // }
     Object.keys(locationUpdates[leadingIndex].fishUpdate).forEach(function(fid){
       var newFishData = locationUpdates[leadingIndex].fishUpdate[fid];
       var prevFishData = locationUpdates[laggingIndex].fishUpdate[fid];
@@ -160,8 +179,11 @@ function drawAll(allFish) {
   allFish.forEach(function(fish){
     drawFish(fish);
   });
+  // drawFish('x')
 }
 
+var start = 0;
+var sprites = {};
 function drawFish(fish){
   context.beginPath();
   context.rect(fish.locX, fish.locY, 100, 50);
@@ -175,4 +197,27 @@ function drawFish(fish){
   else context.rect(fish.locX+85, fish.locY, 15, 50);
   context.fillStyle = 'black';
   context.fill();
+  // context.drawImage(sprites.test,fish.locX,fish.locY, 50, 50);
 }
+
+// function loadSprites(){
+//  var loadedSprites = 0;
+//  var numSprites = 0;
+//  
+//  var sources = {
+//    test: "/images/sprite.png"
+//  };
+//  // get num of sources
+//  for(var src in sources){
+//    numSprites++;
+//  }
+//  for(var src in sources){
+//    sprites[src] = new Image();
+//    sprites[src].onload = function(){
+//      if (++loadedSprites >= numSprites){
+//        drawFish();
+//      }
+//    };
+//    sprites[src].src = sources[src];
+//  }
+// }

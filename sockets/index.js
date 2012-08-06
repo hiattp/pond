@@ -8,10 +8,12 @@ module.exports = function(io){
   var numConnections = 0
     , gameActive = false
     , gameLoopInterval = 100
+    , updateNumber = 0
     , gameLoopTimeout;
   
   var gameLoop = function gameLoop(){
-    io.sockets.emit('all objects', {timestamp : Date.now(), fishUpdate: gameMaster.locationUpdate()});
+    io.sockets.emit('all objects', {number:updateNumber, timestamp : Date.now(), fishUpdate: gameMaster.locationUpdate()});
+    updateNumber++;
     if(gameActive) gameLoopTimeout = setTimeout(gameLoop, gameLoopInterval);
   }
   
